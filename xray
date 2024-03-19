@@ -46,7 +46,7 @@ echo "Google DNS" > /user/current
 rm /usr/local/etc/xray/city >> /dev/null 2>&1
 rm /usr/local/etc/xray/org >> /dev/null 2>&1
 rm /usr/local/etc/xray/timezone >> /dev/null 2>&1
-bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" - install --beta
+bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install
 curl -s ipinfo.io/city >> /usr/local/etc/xray/city
 curl -s ipinfo.io/org | cut -d " " -f 2-10 >> /usr/local/etc/xray/org
 curl -s ipinfo.io/timezone >> /usr/local/etc/xray/timezone
@@ -90,7 +90,7 @@ echo -e "${GB}[ INFO ]${NC} ${YB}Setup Nginx & Xray Conf${NC}"
 cipher="aes-128-gcm"
 cipher2="2022-blake3-aes-128-gcm"
 uuid=$(cat /proc/sys/kernel/random/uuid)
-pwtr=$(openssl rand -hex 4)
+pwtr=$(openssl rand -hex 16)
 pwss=$(echo $RANDOM | md5sum | head -c 6; echo;)
 userpsk=$(openssl rand -base64 16)
 serverpsk=$(openssl rand -base64 16)
@@ -246,7 +246,7 @@ cat > /usr/local/etc/xray/config.json << END
       "settings": {
         "clients": [
           {
-            "password": "$pwtr",
+            "password": "$uuid",
             "level": 0
 #trojan-tcp
           }
@@ -341,7 +341,7 @@ cat > /usr/local/etc/xray/config.json << END
       "settings": {
         "clients": [
           {
-            "password": "$pwtr",
+            "password": "$uuid",
             "level": 0
 #trojan
           }
@@ -493,7 +493,7 @@ cat > /usr/local/etc/xray/config.json << END
       "settings": {
         "clients": [
           {
-            "password": "$pwtr",
+            "password": "$uuid",
             "level": 0
 #trojan-grpc
           }
@@ -628,7 +628,7 @@ cat > /usr/local/etc/xray/config.json << END
       "settings": {
         "clients": [
           {
-            "password": "$pwtr",
+            "password": "$uuid",
             "level": 0
 #trojan
           }
@@ -836,15 +836,33 @@ http {
    }
 }
 END
+
+#Install BBR
+sleep 1
+echo -e "[ ${green}INFO$NC ] Installing bbr.."
+#wget -q -O /usr/bin/bbr "https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh"
+#chmod +x /usr/bin/bbr
+#bbr >/dev/null 2>&1
+#rm /usr/bin/bbr >/dev/null 2>&1
+###
+
 wget -q -O /etc/nginx/conf.d/grpc.conf https://raw.githubusercontent.com/dugong-lewat/autoscript2/main/config/grpc.conf
 
 # wget -q -O /etc/nginx/nginx.conf https://raw.githubusercontent.com/dugong-lewat/autoscript2/main/config/nginx.conf
 # sudo sed -i -e 's/example.com/${domain}/g' /etc/nginx/conf.d/xray.conf
-systemctl restart nginx
+
+#Restart
+echo -e "$yell[SERVICE]$NC Restart All service"
+systemctl daemon-reload
+sleep 1
+echo -e "[ ${green}ok${NC} ] Enable & restart xray "
+systemctl enable xray
 systemctl restart xray
+systemctl restart nginx
 echo -e "${GB}[ INFO ]${NC} ${YB}Setup Done${NC}"
 sleep 1
 clear
+
 # Blokir lalu lintas torrent (BitTorrent)
 sudo iptables -A INPUT -p udp --dport 6881:6889 -j DROP
 sudo iptables -A INPUT -p tcp --dport 6881:6889 -j DROP
@@ -852,7 +870,7 @@ sudo iptables -A INPUT -p tcp --dport 6881:6889 -j DROP
 sudo iptables -A INPUT -p tcp --dport 6881:6889 -m string --algo bm --string "BitTorrent" -j DROP
 sudo iptables -A INPUT -p udp --dport 6881:6889 -m string --algo bm --string "BitTorrent" -j DROP
 cd /usr/bin
-GITHUB=raw.githubusercontent.com/dugong-lewat/autoscript2/main
+GITHUB=raw.githubusercontent.com/TheTimaeus/dugong-autoscriptv2/edit/main
 echo -e "${GB}[ INFO ]${NC} ${YB}Downloading Main Menu${NC}"
 wget -q -O menu "https://${GITHUB}/menu/menu.sh"
 wget -q -O vmess "https://${GITHUB}/menu/vmess.sh"
