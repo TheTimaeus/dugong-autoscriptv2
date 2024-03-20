@@ -53,6 +53,17 @@ curl -s ipinfo.io/timezone >> /usr/local/etc/xray/timezone
 curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
 sudo apt-get install speedtest
 clear
+
+#Install BBR
+sleep 1
+echo -e "[ ${green}INFO$NC ] Installing bbr.."
+#wget -q -O /usr/bin/bbr "https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh"
+#chmod +x /usr/bin/bbr
+#bbr >/dev/null 2>&1
+#rm /usr/bin/bbr >/dev/null 2>&1
+clear
+###
+
 ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 apt install nginx -y
 rm -rf /var/www/html/* >> /dev/null 2>&1
@@ -836,15 +847,6 @@ http {
    }
 }
 END
-
-#Install BBR
-sleep 1
-echo -e "[ ${green}INFO$NC ] Installing bbr.."
-#wget -q -O /usr/bin/bbr "https://raw.githubusercontent.com/ylx2016/Linux-NetSpeed/master/tcp.sh"
-#chmod +x /usr/bin/bbr
-#bbr >/dev/null 2>&1
-#rm /usr/bin/bbr >/dev/null 2>&1
-###
 
 wget -q -O /etc/nginx/conf.d/grpc.conf https://raw.githubusercontent.com/dugong-lewat/autoscript2/main/config/grpc.conf
 
